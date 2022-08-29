@@ -19,7 +19,7 @@ public class Anim {
         time += Gdx.graphics.getDeltaTime();
     }
 
-    public Anim(String imgName, int col, int row, Animation.PlayMode playMode, float frameDuration){
+    public Anim(String imgName, int col, int row, Animation.PlayMode playMode, float frameDuration) {
         img = new Texture(imgName);
         TextureRegion region0 = new TextureRegion(img);
         int xCnt = region0.getRegionWidth() / col;
@@ -45,20 +45,24 @@ public class Anim {
         this.time += time;
     }
 
-    public void zeroTime(){
+    public void zeroTime() {
         this.time = 0;
     }
 
-    public boolean isAnimationOver(){
+    public boolean isAnimationOver() {
         return animation.isAnimationFinished(time);
     }
 
-    public void setPlayMode(Animation.PlayMode playMode){
+    public void setPlayMode(Animation.PlayMode playMode) {
         animation.setPlayMode(playMode);
     }
 
-    public void dispose (){
-       // img.dispose();
-        atlas.dispose();
+    public void dispose() {
+        if (this.img != null) {
+            img.dispose();
+        }
+        if (this.atlas != null) {
+            atlas.dispose();
+        }
     }
 }
