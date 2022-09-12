@@ -10,10 +10,12 @@ public class PhysX {
     private final World world;
     private final Box2DDebugRenderer debugRenderer;
     public final float PPM = 100;
+    public ContList contactListener;
 
     public PhysX() {
         world = new World(new Vector2(0, -9.81f), true);
         debugRenderer = new Box2DDebugRenderer();
+        world.setContactListener(contactListener);
     }
 
     public Body addObject(RectangleMapObject object){
@@ -32,13 +34,23 @@ public class PhysX {
         PolygonShape polygonShape = new PolygonShape();
         polygonShape.setAsBox(rectangle.width/2/PPM, rectangle.height/2/PPM);
         fDef.shape = polygonShape;
-        fDef.friction = 0.5f;
+        fDef.friction = 0.3f;
         fDef.density = 0.1f;
         fDef.restitution = (float) object.getProperties().get("restitution");
         Body body = world.createBody(def);
-        body.createFixture(fDef).setUserData("wall");
+        String name = object.getName();
+        if (name!= null && name.equals("hero")){
+            polygonShape.setAsBox(rectangle.width/3/PPM, rectangle.height/12/PPM, new Vector2(0, -rectangle.width/2/PPM), 0);
+            body.createFixture(fDef).setUserData("sensor");
+            body.getFixtureList().get(body.getFixtureList().size-1).setSensor(true);
+        }
+        body.createFixture(fDef).setUserData(name);
         polygonShape.dispose();
         return body;
+    }
+
+    public void destroyBody(Body body){
+        world.destroyBody(body);
     }
 
     public void setGravity(Vector2 gravity){

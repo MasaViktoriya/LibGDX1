@@ -24,8 +24,9 @@ import com.mygdx.game.Anim;
 import com.mygdx.game.Main;
 import com.mygdx.game.PhysX;
 
+import java.util.ArrayList;
+
 public class GameScreen implements Screen {
-    //private final float STEP = 12;
     private Main game;
     private SpriteBatch batch;
     //private Texture menuButton;
@@ -35,6 +36,7 @@ public class GameScreen implements Screen {
     private OrthographicCamera camera;
     private TiledMap map;
     private OrthogonalTiledMapRenderer mapRenderer;
+    private Array<RectangleMapObject> objects;
     boolean direction = true;
     boolean movingForward = true;
     float x;
@@ -42,11 +44,12 @@ public class GameScreen implements Screen {
     private final int[] bg;
     private final int[] l1;
     private final int[] l2;
-    //private final ShapeRenderer shapeRenderer;
+    private final ShapeRenderer shapeRenderer;
     private PhysX physX;
     private Body body;
     private final Rectangle heroRect;
     private final Music backgroundMusic;
+    public static ArrayList<Body> bodies;
 
 
     public GameScreen(Main game) {
@@ -56,6 +59,7 @@ public class GameScreen implements Screen {
         //img = new Texture("x32-florest-mushroom-06.png");
         //menuRect = new Rectangle(Gdx.graphics.getWidth() - menuButton.getWidth(), Gdx.graphics.getHeight() - menuButton.getHeight(), menuButton.getWidth(), menuButton.getHeight());
         animation = new Anim("bird/bird.atlas", "skeleton-01_fly", Animation.PlayMode.LOOP, 1 / 40f);
+        bodies = new ArrayList<>();
 
         camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.zoom = 1.2f;
@@ -68,13 +72,13 @@ public class GameScreen implements Screen {
         l1[0] = map.getLayers().getIndex("tiles");
         l2 = new int[1];
         l2[0] = map.getLayers().getIndex("tiles2");
-        //shapeRenderer = new ShapeRenderer();
+        shapeRenderer = new ShapeRenderer();
 
         physX = new PhysX();
         RectangleMapObject hero = (RectangleMapObject) map.getLayers().get("setting").getObjects().get("hero"); //choose by object name
         heroRect = hero.getRectangle();
         body = physX.addObject(hero);
-        Array<RectangleMapObject> objects =  map.getLayers().get("objects").getObjects().getByType(RectangleMapObject.class); //choose by type
+        objects =  map.getLayers().get("objects").getObjects().getByType(RectangleMapObject.class); //choose by type
         for (int i = 0; i < objects.size; i++) {
             physX.addObject(objects.get(i));
         }
@@ -94,16 +98,16 @@ public class GameScreen implements Screen {
     public void render(float delta) {
 
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            body.applyForceToCenter(new Vector2(-1, 0), true);
+            body.applyForceToCenter(new Vector2(-0.1f, 0), true);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            body.applyForceToCenter(new Vector2(1, 0), true);
+            body.applyForceToCenter(new Vector2(0.1f, 0), true);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            body.applyForceToCenter(new Vector2(0, 1.5f), true);
+            body.applyForceToCenter(new Vector2(0, 0.5f), true);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            body.applyForceToCenter(new Vector2(0, -1), true);
+            body.applyForceToCenter(new Vector2(0, -0.1f), true);
         }
 
         camera.position.x = body.getPosition().x * physX.PPM;
@@ -178,17 +182,22 @@ public class GameScreen implements Screen {
             game.setScreen(new MenuScreen(game));
             // }
         }
-/*        shapeRenderer.setProjectionMatrix(camera.combined);
+        shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setColor(Color.BLACK);
         for (int i = 0; i < objects.size; i++) {
             Rectangle mapSize = objects.get(i).getRectangle();
             shapeRenderer.rect(mapSize.x, mapSize.y, mapSize.width, mapSize.height);
         }
-        shapeRenderer.end();*/
+        shapeRenderer.end();
 
         physX.step();
         physX.debugDraw(camera);
+
+        for (int i = 0; i < bodies.size(); i++) {
+            physX.destroyBody(bodies.get(i));
+        }
+        bodies.clear();
     }
 
     @Override
@@ -218,5 +227,8 @@ public class GameScreen implements Screen {
         //this.menuButton.dispose();
         //this.img.dispose();
         this.animation.dispose();
+        this.physX.dispose();
+        this.backgroundMusic.dispose();
+        this.shapeRenderer.dispose();
     }
 }
