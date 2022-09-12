@@ -29,7 +29,7 @@ public class MenuScreen implements Screen {
         img = new Texture("localbird.png");
         startRect = new Rectangle(0, 0, img.getWidth(), img.getHeight());
         shapeRenderer = new ShapeRenderer();
-        music = Gdx.audio.newMusic(Gdx.files.internal("Fooled Around and Fell In Love   Soundtrack Wonder Band.mp3"));
+        music = Gdx.audio.newMusic(Gdx.files.internal("For What Its Worth Buffalo Springfield.mp3"));
         music.setLooping(true);
         music.setVolume(0.1f);
         music.play();

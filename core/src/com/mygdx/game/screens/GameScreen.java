@@ -79,7 +79,7 @@ public class GameScreen implements Screen {
             physX.addObject(objects.get(i));
         }
         
-        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("For What Its Worth Buffalo Springfield.mp3"));
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Fooled Around and Fell In Love   Soundtrack Wonder Band.mp3"));
         backgroundMusic.setLooping(true);
         backgroundMusic.setVolume(0.1f);
         backgroundMusic.play();
@@ -93,17 +93,17 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
-            body.applyForceToCenter(new Vector2(-1000, 0), true);
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+            body.applyForceToCenter(new Vector2(-1, 0), true);
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
-            body.applyForceToCenter(new Vector2(1000, 0), true);
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+            body.applyForceToCenter(new Vector2(1, 0), true);
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
-            body.applyForceToCenter(new Vector2(0, 1500), true);
+        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+            body.applyForceToCenter(new Vector2(0, 1.5f), true);
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
-            body.applyForceToCenter(new Vector2(0, -1000), true);
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+            body.applyForceToCenter(new Vector2(0, -1), true);
         }
 
         camera.position.x = body.getPosition().x * physX.PPM;
@@ -145,10 +145,9 @@ public class GameScreen implements Screen {
             animation.getFrame().flip(true, false);
         }
 
-        heroRect.x = body.getPosition().x - heroRect.width/2;
-        heroRect.y = body.getPosition().y - heroRect.height/2;
+        heroRect.x = Gdx.graphics.getWidth()/2 - heroRect.width/2/camera.zoom;
+        heroRect.y = Gdx.graphics.getHeight()/2 - heroRect.height/2/camera.zoom;
 
-        batch.setProjectionMatrix(camera.combined);
         batch.begin();
        // batch.draw(menuButton, Gdx.graphics.getWidth() - menuButton.getWidth(), Gdx.graphics.getHeight() - menuButton.getHeight());
        // batch.draw(img, heroRect.x, heroRect.y, heroRect.width, heroRect.height);

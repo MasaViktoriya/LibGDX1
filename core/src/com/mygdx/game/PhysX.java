@@ -9,7 +9,7 @@ import com.badlogic.gdx.physics.box2d.*;
 public class PhysX {
     private final World world;
     private final Box2DDebugRenderer debugRenderer;
-    public final float PPM = 10;
+    public final float PPM = 100;
 
     public PhysX() {
         world = new World(new Vector2(0, -9.81f), true);
@@ -32,7 +32,7 @@ public class PhysX {
         PolygonShape polygonShape = new PolygonShape();
         polygonShape.setAsBox(rectangle.width/2/PPM, rectangle.height/2/PPM);
         fDef.shape = polygonShape;
-        fDef.friction = 0.2f;
+        fDef.friction = 0.5f;
         fDef.density = 0.1f;
         fDef.restitution = (float) object.getProperties().get("restitution");
         Body body = world.createBody(def);
