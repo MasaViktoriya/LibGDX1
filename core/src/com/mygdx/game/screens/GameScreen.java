@@ -3,6 +3,7 @@ package com.mygdx.game.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -45,6 +46,7 @@ public class GameScreen implements Screen {
     private PhysX physX;
     private Body body;
     private final Rectangle heroRect;
+    private final Music backgroundMusic;
 
 
     public GameScreen(Main game) {
@@ -76,6 +78,11 @@ public class GameScreen implements Screen {
         for (int i = 0; i < objects.size; i++) {
             physX.addObject(objects.get(i));
         }
+        
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("For What Its Worth Buffalo Springfield.mp3"));
+        backgroundMusic.setLooping(true);
+        backgroundMusic.setVolume(0.1f);
+        backgroundMusic.play();
     }
 
     @Override
@@ -87,20 +94,20 @@ public class GameScreen implements Screen {
     public void render(float delta) {
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
-            body.applyForceToCenter(new Vector2(10000, 0), true);
+            body.applyForceToCenter(new Vector2(-1000, 0), true);
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
-            body.applyForceToCenter(new Vector2(-10000, 0), true);
+            body.applyForceToCenter(new Vector2(1000, 0), true);
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
-            body.applyForceToCenter(new Vector2(0, 10000), true);
+            body.applyForceToCenter(new Vector2(0, 1500), true);
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
-            body.applyForceToCenter(new Vector2(0, -10000), true);
+            body.applyForceToCenter(new Vector2(0, -1000), true);
         }
 
-        camera.position.x = body.getPosition().x;
-        camera.position.y = body.getPosition().y;
+        camera.position.x = body.getPosition().x * physX.PPM;
+        camera.position.y = body.getPosition().y * physX.PPM;
         camera.update();
         ScreenUtils.clear(Color.WHITE);
         if (Gdx.input.isKeyJustPressed(Input.Keys.O)) {

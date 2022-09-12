@@ -9,6 +9,7 @@ import com.badlogic.gdx.physics.box2d.*;
 public class PhysX {
     private final World world;
     private final Box2DDebugRenderer debugRenderer;
+    public final float PPM = 10;
 
     public PhysX() {
         world = new World(new Vector2(0, -9.81f), true);
@@ -26,10 +27,10 @@ public class PhysX {
         if(type.equals("DynamicBody")){
             def.type = BodyDef.BodyType.DynamicBody;
         }
-        def.position.set(rectangle.x + rectangle.width/2, rectangle.y +rectangle.height/2);
+        def.position.set((rectangle.x + rectangle.width/2)/PPM, (rectangle.y +rectangle.height/2)/PPM);
         def.gravityScale = (float) object.getProperties().get("gravityScale");
         PolygonShape polygonShape = new PolygonShape();
-        polygonShape.setAsBox(rectangle.width/2, rectangle.height/2);
+        polygonShape.setAsBox(rectangle.width/2/PPM, rectangle.height/2/PPM);
         fDef.shape = polygonShape;
         fDef.friction = 0.2f;
         fDef.density = 0.1f;

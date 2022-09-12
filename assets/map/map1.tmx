@@ -146,11 +146,11 @@
   </object>
  </objectgroup>
  <objectgroup id="6" name="setting">
-  <object id="32" name="hero" x="349.333" y="12" width="77.3333" height="74.6667">
+  <object id="32" name="hero" x="52" y="29.3333" width="77.3333" height="74.6667">
    <properties>
     <property name="BodyType" value="DynamicBody"/>
-    <property name="gravityScale" type="float" value="20"/>
-    <property name="restitution" type="float" value="0.75"/>
+    <property name="gravityScale" type="float" value="1"/>
+    <property name="restitution" type="float" value="0.1"/>
    </properties>
   </object>
  </objectgroup>

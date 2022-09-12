@@ -3,6 +3,8 @@ package com.mygdx.game.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -18,6 +20,8 @@ public class MenuScreen implements Screen {
     private Texture img;
     private Rectangle startRect;
     private ShapeRenderer shapeRenderer;
+    private final Music music;
+    private final Sound sound;
 
     public MenuScreen(Main game) {
         this.game = game;
@@ -25,6 +29,11 @@ public class MenuScreen implements Screen {
         img = new Texture("localbird.png");
         startRect = new Rectangle(0, 0, img.getWidth(), img.getHeight());
         shapeRenderer = new ShapeRenderer();
+        music = Gdx.audio.newMusic(Gdx.files.internal("Fooled Around and Fell In Love   Soundtrack Wonder Band.mp3"));
+        music.setLooping(true);
+        music.setVolume(0.1f);
+        music.play();
+        sound = Gdx.audio.newSound(Gdx.files.internal("353227__tec-studio__brd17.mp3"));
     }
 
     @Override
@@ -49,8 +58,9 @@ public class MenuScreen implements Screen {
             if(startRect.contains(x, y)){
                 dispose();
                 game.setScreen(new GameScreen(game));
+            }else {
+                sound.play();
             }
-
         }
 
     }
@@ -80,5 +90,6 @@ public class MenuScreen implements Screen {
         this.batch.dispose();
         this.img.dispose();
         this.shapeRenderer.dispose();
+        this.music.dispose();
     }
 }
