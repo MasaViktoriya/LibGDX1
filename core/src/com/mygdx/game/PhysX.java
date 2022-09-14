@@ -9,13 +9,12 @@ import com.badlogic.gdx.physics.box2d.*;
 public class PhysX {
     private final World world;
     private final Box2DDebugRenderer debugRenderer;
-    public final float PPM = 100;
-    public ContList contactListener;
+    public final float PPM = 1;
 
     public PhysX() {
         world = new World(new Vector2(0, -9.81f), true);
         debugRenderer = new Box2DDebugRenderer();
-        world.setContactListener(contactListener);
+        world.setContactListener(new ContList());
     }
 
     public Body addObject(RectangleMapObject object){
@@ -37,14 +36,22 @@ public class PhysX {
         fDef.friction = 0.3f;
         fDef.density = 0.1f;
         fDef.restitution = (float) object.getProperties().get("restitution");
-        Body body = world.createBody(def);
-        String name = object.getName();
+        Body body;
+        body = world.createBody(def);
+        String name ="";
+        if(object.getName()!= null) {
+            name = object.getName();
+        }
+        body.createFixture(fDef).setUserData(name);
         if (name!= null && name.equals("hero")){
             polygonShape.setAsBox(rectangle.width/3/PPM, rectangle.height/12/PPM, new Vector2(0, -rectangle.width/2/PPM), 0);
             body.createFixture(fDef).setUserData("sensor");
+            body.setFixedRotation(true);
+            fDef.restitution = 0;
             body.getFixtureList().get(body.getFixtureList().size-1).setSensor(true);
+            body.getFixtureList().get(0).setRestitution(0);
         }
-        body.createFixture(fDef).setUserData(name);
+
         polygonShape.dispose();
         return body;
     }

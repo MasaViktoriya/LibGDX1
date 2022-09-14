@@ -50,6 +50,8 @@ public class GameScreen implements Screen {
     private final Rectangle heroRect;
     private final Music backgroundMusic;
     public static ArrayList<Body> bodies;
+    public static boolean jump = false;
+    public static boolean mushroomJump = false;
 
 
     public GameScreen(Main game) {
@@ -78,6 +80,7 @@ public class GameScreen implements Screen {
         RectangleMapObject hero = (RectangleMapObject) map.getLayers().get("setting").getObjects().get("hero"); //choose by object name
         heroRect = hero.getRectangle();
         body = physX.addObject(hero);
+        body.setFixedRotation(true);
         objects =  map.getLayers().get("objects").getObjects().getByType(RectangleMapObject.class); //choose by type
         for (int i = 0; i < objects.size; i++) {
             physX.addObject(objects.get(i));
@@ -98,16 +101,21 @@ public class GameScreen implements Screen {
     public void render(float delta) {
 
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            body.applyForceToCenter(new Vector2(-0.1f, 0), true);
+            body.applyForceToCenter(new Vector2(-1000000f, 0), true);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            body.applyForceToCenter(new Vector2(0.1f, 0), true);
+            body.applyForceToCenter(new Vector2(1000000f, 0), true);
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            body.applyForceToCenter(new Vector2(0, 0.5f), true);
+        if (Gdx.input.isKeyPressed(Input.Keys.UP) && jump) {
+            body.applyForceToCenter(new Vector2(0, 3900000f), true);
+            jump = false;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.UP) && mushroomJump) {
+            body.applyForceToCenter(new Vector2(0, 50000000f), true);
+            mushroomJump = false;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            body.applyForceToCenter(new Vector2(0, -0.1f), true);
+            body.applyForceToCenter(new Vector2(0, -1000000f), true);
         }
 
         camera.position.x = body.getPosition().x * physX.PPM;

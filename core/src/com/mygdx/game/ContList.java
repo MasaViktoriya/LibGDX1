@@ -17,6 +17,18 @@ public class ContList implements ContactListener {
             if(tmpB.equals("hero")&&tmpA.equals("coin")){
                 GameScreen.bodies.add(a.getBody());
             }
+            if(tmpA.equals("sensor")&&tmpB.equals("wall")){
+                GameScreen.jump = true;
+            }
+            if(tmpB.equals("sensor")&&tmpA.equals("wall")){
+                GameScreen.jump = true;
+            }
+            if(tmpB.equals("sensor")&&tmpA.equals("mushroom")){
+                GameScreen.mushroomJump = true;
+            }
+            if(tmpA.equals("sensor")&&tmpB.equals("mushroom")){
+                GameScreen.mushroomJump = true;
+            }
         }
     }
 
