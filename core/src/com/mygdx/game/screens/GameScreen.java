@@ -3,6 +3,7 @@ package com.mygdx.game.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -23,8 +24,9 @@ import com.mygdx.game.Anim;
 import com.mygdx.game.Main;
 import com.mygdx.game.PhysX;
 
+import java.util.ArrayList;
+
 public class GameScreen implements Screen {
-    //private final float STEP = 12;
     private Main game;
     private SpriteBatch batch;
     //private Texture menuButton;
@@ -34,6 +36,7 @@ public class GameScreen implements Screen {
     private OrthographicCamera camera;
     private TiledMap map;
     private OrthogonalTiledMapRenderer mapRenderer;
+    private Array<RectangleMapObject> objects;
     boolean direction = true;
     boolean movingForward = true;
     float x;
@@ -41,10 +44,14 @@ public class GameScreen implements Screen {
     private final int[] bg;
     private final int[] l1;
     private final int[] l2;
-    //private final ShapeRenderer shapeRenderer;
+    private final ShapeRenderer shapeRenderer;
     private PhysX physX;
     private Body body;
     private final Rectangle heroRect;
+    private final Music backgroundMusic;
+    public static ArrayList<Body> bodies;
+    public static boolean jump = false;
+    public static boolean mushroomJump = false;
 
 
     public GameScreen(Main game) {
@@ -54,6 +61,7 @@ public class GameScreen implements Screen {
         //img = new Texture("x32-florest-mushroom-06.png");
         //menuRect = new Rectangle(Gdx.graphics.getWidth() - menuButton.getWidth(), Gdx.graphics.getHeight() - menuButton.getHeight(), menuButton.getWidth(), menuButton.getHeight());
         animation = new Anim("bird/bird.atlas", "skeleton-01_fly", Animation.PlayMode.LOOP, 1 / 40f);
+        bodies = new ArrayList<>();
 
         camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.zoom = 1.2f;
@@ -66,16 +74,22 @@ public class GameScreen implements Screen {
         l1[0] = map.getLayers().getIndex("tiles");
         l2 = new int[1];
         l2[0] = map.getLayers().getIndex("tiles2");
-        //shapeRenderer = new ShapeRenderer();
+        shapeRenderer = new ShapeRenderer();
 
         physX = new PhysX();
         RectangleMapObject hero = (RectangleMapObject) map.getLayers().get("setting").getObjects().get("hero"); //choose by object name
         heroRect = hero.getRectangle();
         body = physX.addObject(hero);
-        Array<RectangleMapObject> objects =  map.getLayers().get("objects").getObjects().getByType(RectangleMapObject.class); //choose by type
+        body.setFixedRotation(true);
+        objects =  map.getLayers().get("objects").getObjects().getByType(RectangleMapObject.class); //choose by type
         for (int i = 0; i < objects.size; i++) {
             physX.addObject(objects.get(i));
         }
+        
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Fooled Around and Fell In Love   Soundtrack Wonder Band.mp3"));
+        backgroundMusic.setLooping(true);
+        backgroundMusic.setVolume(0.1f);
+        backgroundMusic.play();
     }
 
     @Override
@@ -86,21 +100,26 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
-            body.applyForceToCenter(new Vector2(10000, 0), true);
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+            body.applyForceToCenter(new Vector2(-1000000f, 0), true);
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
-            body.applyForceToCenter(new Vector2(-10000, 0), true);
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+            body.applyForceToCenter(new Vector2(1000000f, 0), true);
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
-            body.applyForceToCenter(new Vector2(0, 10000), true);
+        if (Gdx.input.isKeyPressed(Input.Keys.UP) && jump) {
+            body.applyForceToCenter(new Vector2(0, 3900000f), true);
+            jump = false;
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
-            body.applyForceToCenter(new Vector2(0, -10000), true);
+        if (Gdx.input.isKeyPressed(Input.Keys.UP) && mushroomJump) {
+            body.applyForceToCenter(new Vector2(0, 50000000f), true);
+            mushroomJump = false;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+            body.applyForceToCenter(new Vector2(0, -1000000f), true);
         }
 
-        camera.position.x = body.getPosition().x;
-        camera.position.y = body.getPosition().y;
+        camera.position.x = body.getPosition().x * physX.PPM;
+        camera.position.y = body.getPosition().y * physX.PPM;
         camera.update();
         ScreenUtils.clear(Color.WHITE);
         if (Gdx.input.isKeyJustPressed(Input.Keys.O)) {
@@ -138,10 +157,9 @@ public class GameScreen implements Screen {
             animation.getFrame().flip(true, false);
         }
 
-        heroRect.x = body.getPosition().x - heroRect.width/2;
-        heroRect.y = body.getPosition().y - heroRect.height/2;
+        heroRect.x = Gdx.graphics.getWidth()/2 - heroRect.width/2/camera.zoom;
+        heroRect.y = Gdx.graphics.getHeight()/2 - heroRect.height/2/camera.zoom;
 
-        batch.setProjectionMatrix(camera.combined);
         batch.begin();
        // batch.draw(menuButton, Gdx.graphics.getWidth() - menuButton.getWidth(), Gdx.graphics.getHeight() - menuButton.getHeight());
        // batch.draw(img, heroRect.x, heroRect.y, heroRect.width, heroRect.height);
@@ -172,17 +190,22 @@ public class GameScreen implements Screen {
             game.setScreen(new MenuScreen(game));
             // }
         }
-/*        shapeRenderer.setProjectionMatrix(camera.combined);
+        shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setColor(Color.BLACK);
         for (int i = 0; i < objects.size; i++) {
             Rectangle mapSize = objects.get(i).getRectangle();
             shapeRenderer.rect(mapSize.x, mapSize.y, mapSize.width, mapSize.height);
         }
-        shapeRenderer.end();*/
+        shapeRenderer.end();
 
         physX.step();
         physX.debugDraw(camera);
+
+        for (int i = 0; i < bodies.size(); i++) {
+            physX.destroyBody(bodies.get(i));
+        }
+        bodies.clear();
     }
 
     @Override
@@ -212,5 +235,8 @@ public class GameScreen implements Screen {
         //this.menuButton.dispose();
         //this.img.dispose();
         this.animation.dispose();
+        this.physX.dispose();
+        this.backgroundMusic.dispose();
+        this.shapeRenderer.dispose();
     }
 }
