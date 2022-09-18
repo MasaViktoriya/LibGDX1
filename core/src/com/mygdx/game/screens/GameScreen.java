@@ -2,11 +2,11 @@ package com.mygdx.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -17,7 +17,6 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.mygdx.game.Anim;
@@ -45,6 +44,7 @@ public class GameScreen implements Screen {
     private final int[] l1;
     private final int[] l2;
     private final ShapeRenderer shapeRenderer;
+    private KeyboardController keyboardController;
     private PhysX physX;
     private Body body;
     private final Rectangle heroRect;
@@ -53,10 +53,69 @@ public class GameScreen implements Screen {
     public static boolean jump = false;
     public static boolean mushroomJump = false;
 
+    private class KeyboardController implements InputProcessor {
+        @Override
+        public boolean keyDown(int keycode) {
+            if (keycode == Input.Keys.LEFT) {
+            body.applyForceToCenter(new Vector2(-8f, 0), true);
+        }
+            if (keycode == Input.Keys.RIGHT) {
+                body.applyForceToCenter(new Vector2(8f, 0), true);
+            }
+            if (keycode == Input.Keys.UP && jump) {
+                body.applyForceToCenter(new Vector2(0, 25f), true);
+                jump = false;
+            }
+            if (keycode == Input.Keys.UP && mushroomJump) {
+                body.applyForceToCenter(new Vector2(0, 35f), true);
+                mushroomJump = false;
+            }
+            if (keycode == Input.Keys.DOWN) {
+                body.applyForceToCenter(new Vector2(0, -4f), true);
+            }
+            return false;
+        }
+
+        @Override
+        public boolean keyUp(int keycode) { return false; }
+
+        @Override
+        public boolean keyTyped(char character) {
+            return false;
+        }
+
+        @Override
+        public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+            return false;
+        }
+
+        @Override
+        public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+            return false;
+        }
+
+        @Override
+        public boolean touchDragged(int screenX, int screenY, int pointer) {
+            return false;
+        }
+
+        @Override
+        public boolean mouseMoved(int screenX, int screenY) {
+            return false;
+        }
+
+        @Override
+        public boolean scrolled(float amountX, float amountY) {
+            return false;
+        }
+    }
+
 
     public GameScreen(Main game) {
         this.game = game;
         batch = new SpriteBatch();
+        keyboardController = new KeyboardController();
+        Gdx.input.setInputProcessor(keyboardController);
         //menuButton = new Texture("");
         //img = new Texture("x32-florest-mushroom-06.png");
         //menuRect = new Rectangle(Gdx.graphics.getWidth() - menuButton.getWidth(), Gdx.graphics.getHeight() - menuButton.getHeight(), menuButton.getWidth(), menuButton.getHeight());
@@ -100,23 +159,7 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
 
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            body.applyForceToCenter(new Vector2(-1000000f, 0), true);
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            body.applyForceToCenter(new Vector2(1000000f, 0), true);
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.UP) && jump) {
-            body.applyForceToCenter(new Vector2(0, 3900000f), true);
-            jump = false;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.UP) && mushroomJump) {
-            body.applyForceToCenter(new Vector2(0, 50000000f), true);
-            mushroomJump = false;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            body.applyForceToCenter(new Vector2(0, -1000000f), true);
-        }
+
 
         camera.position.x = body.getPosition().x * physX.PPM;
         camera.position.y = body.getPosition().y * physX.PPM;

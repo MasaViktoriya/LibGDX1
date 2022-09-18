@@ -9,7 +9,7 @@ import com.badlogic.gdx.physics.box2d.*;
 public class PhysX {
     private final World world;
     private final Box2DDebugRenderer debugRenderer;
-    public final float PPM = 1;
+    public final float PPM = 100;
 
     public PhysX() {
         world = new World(new Vector2(0, -9.81f), true);
